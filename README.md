@@ -64,6 +64,8 @@ If your project uses SCSS, you can change the default style variables.
 To create a scss file. e.g. `datepicker.scss`:
 
 ```scss
+$namespace: 'xmx'; // change the 'mx' to 'xmx'. then <date-picker prefix-class="xmx" />
+
 $default-color: #555;
 $primary-color: #1284e7;
 
@@ -109,47 +111,51 @@ You can also override some of the default locale by `lang`.
 
 ### Props
 
-| Prop                | Description                                    | Type                                        | Default        |
-| ------------------- | ---------------------------------------------- | ------------------------------------------- | -------------- |
-| type                | select the type of picker                      | date \|datetime\|year\|month\|time\|week    | 'date'         |
-| range               | if true, pick the range date                   | `boolean`                                   | false          |
-| format              | to set the date format. similar to moment.js   | [token](#token)                             | 'YYYY-MM-DD'   |
-| value-type          | data type of the binding value                 | [value-type](#value-type)                   | 'date'         |
-| default-value       | default date of the calendar                   | `Date`                                      | new Date()     |
-| lang                | override the default locale                    | `object`                                    |                |
-| placeholder         | input placeholder text                         | `string`                                    | ''             |
-| editable            | whether the input is editable                  | `boolean`                                   | true           |
-| clearable           | if false, don't show the clear icon            | `boolean`                                   | true           |
-| confirm             | if true, need click the button to change value | `boolean`                                   | false          |
-| confirm-text        | the text of confirm button                     | `string`                                    | 'OK'           |
-| disabled            | disable the component                          | `boolean`                                   | false          |
-| disabled-date       | specify the date that cannot be selected       | `(date) => boolean`                         | -              |
-| disabled-time       | specify the time that cannot be selected       | `(date) => boolean`                         | -              |
-| append-to-body      | append the popup to body                       | `boolean`                                   | true           |
-| inline              | without input                                  | `boolean`                                   | false          |
-| input-class         | input classname                                | `string`                                    | 'mx-input'     |
-| input-attr          | input attrs(eg: { name: 'date', id: 'foo'})    | `object`                                    | —              |
-| open                | open state of picker                           | `boolean`                                   | -              |
-| popup-style         | popup style                                    | `object`                                    | —              |
-| popup-class         | popup classes                                  |                                             | —              |
-| shortcuts           | set shortcuts to select                        | `Array<{text, onClick}>`                    | -              |
-| title-format        | format of the tooltip in calendar cell         | [token](#token)                             | 'YYYY-MM-DD'   |
-| partial-update      | whether update date when select year or month  | `boolean`                                   | false          |
-| range-separator     | text of range separator                        | `string`                                    | ' ~ '          |
-| show-week-number    | determine whether show week number             | `boolean`                                   | false          |
-| hour-step           | interval between hours in time picker          | 1 - 60                                      | 1              |
-| minute-step         | interval between minutes in time picker        | 1 - 60                                      | 1              |
-| second-step         | interval between seconds in time picker        | 1 - 60                                      | 1              |
-| hour-options        | custom hour column                             | `Array<number>`                             | -              |
-| minute-options      | custom minute column                           | `Array<number>`                             | -              |
-| second-options      | custom second column                           | `Array<number>`                             | -              |
-| show-hour           | whether show hour column                       | `boolean`                                   | base on format |
-| show-minute         | whether show minute column                     | `boolean`                                   | base on format |
-| show-second         | whether show second column                     | `boolean`                                   | base on format |
-| use12h              | whether show ampm column                       | `boolean`                                   | base on format |
-| show-time-header    | whether show header of time picker             | `boolean`                                   | false          |
-| time-title-format   | format of the time header                      | [token](#token)                             | 'YYYY-MM-DD'   |
-| time-picker-options | set fixed time list to select                  | [time-picker-options](#time-picker-options) | null           |
+| Prop                | Description                                      | Type                                        | Default        |
+| ------------------- | ------------------------------------------------ | ------------------------------------------- | -------------- |
+| type                | select the type of picker                        | date \|datetime\|year\|month\|time\|week    | 'date'         |
+| range               | if true, pick the range date                     | `boolean`                                   | false          |
+| format              | to set the date format. similar to moment.js     | [token](#token)                             | 'YYYY-MM-DD'   |
+| value-type          | data type of the binding value                   | [value-type](#value-type)                   | 'date'         |
+| default-value       | default date of the calendar                     | `Date`                                      | new Date()     |
+| lang                | override the default locale                      | `object`                                    |                |
+| placeholder         | input placeholder text                           | `string`                                    | ''             |
+| editable            | whether the input is editable                    | `boolean`                                   | true           |
+| clearable           | if false, don't show the clear icon              | `boolean`                                   | true           |
+| confirm             | if true, need click the button to change value   | `boolean`                                   | false          |
+| confirm-text        | the text of confirm button                       | `string`                                    | 'OK'           |
+| multiple            | if true, multi-select date                       | `boolean`                                   | false          |
+| disabled            | disable the component                            | `boolean`                                   | false          |
+| disabled-date       | specify the date that cannot be selected         | `(date) => boolean`                         | -              |
+| disabled-time       | specify the time that cannot be selected         | `(date) => boolean`                         | -              |
+| append-to-body      | append the popup to body                         | `boolean`                                   | true           |
+| inline              | without input                                    | `boolean`                                   | false          |
+| input-class         | input classname                                  | `string`                                    | 'mx-input'     |
+| input-attr          | input attrs(eg: { name: 'date', id: 'foo'})      | `object`                                    | —              |
+| open                | open state of picker                             | `boolean`                                   | -              |
+| default-panel       | default panel of the picker                      | year\|month                                 | -              |
+| popup-style         | popup style                                      | `object`                                    | —              |
+| popup-class         | popup classes                                    |                                             | —              |
+| shortcuts           | set shortcuts to select                          | `Array<{text, onClick}>`                    | -              |
+| title-format        | format of the tooltip in calendar cell           | [token](#token)                             | 'YYYY-MM-DD'   |
+| partial-update      | whether update date when select year or month    | `boolean`                                   | false          |
+| range-separator     | text of range separator                          | `string`                                    | ' ~ '          |
+| show-week-number    | determine whether show week number               | `boolean`                                   | false          |
+| hour-step           | interval between hours in time picker            | 1 - 60                                      | 1              |
+| minute-step         | interval between minutes in time picker          | 1 - 60                                      | 1              |
+| second-step         | interval between seconds in time picker          | 1 - 60                                      | 1              |
+| hour-options        | custom hour column                               | `Array<number>`                             | -              |
+| minute-options      | custom minute column                             | `Array<number>`                             | -              |
+| second-options      | custom second column                             | `Array<number>`                             | -              |
+| show-hour           | whether show hour column                         | `boolean`                                   | base on format |
+| show-minute         | whether show minute column                       | `boolean`                                   | base on format |
+| show-second         | whether show second column                       | `boolean`                                   | base on format |
+| use12h              | whether show ampm column                         | `boolean`                                   | base on format |
+| show-time-header    | whether show header of time picker               | `boolean`                                   | false          |
+| time-title-format   | format of the time header                        | [token](#token)                             | 'YYYY-MM-DD'   |
+| time-picker-options | set fixed time list to select                    | [time-picker-options](#time-picker-options) | null           |
+| prefix-class        | set prefix class                                 | `string`                                    | 'mx'           |
+| scroll-duration     | set the duration of scroll when hour is selected | `number`                                    | 100            |
 
 #### Token
 
@@ -270,7 +276,7 @@ Set fixed time list to select;
 | --------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | input           | When the value change(v-model event)                                               | date                                                                                                                     |
 | change          | When the value change(same as input)                                               | date, type('date'\|'hour'\|'minute'\|'second'\|'ampm                                                                     |
-| open            | When panel opening                                                                 | event                                                                                                                         |
+| open            | When panel opening                                                                 | event                                                                                                                    |
 | close           | When panel closing                                                                 |                                                                                                                          |
 | confirm         | When click 'confirm' button                                                        | date                                                                                                                     |
 | clear           | When click 'clear' button                                                          |                                                                                                                          |
@@ -294,6 +300,15 @@ Set fixed time list to select;
 ## ChangeLog
 
 [CHANGELOG](CHANGELOG.md)
+
+## One-time Donations
+
+If you find this project useful, you can buy me a coffee
+
+[Paypal Me](https://www.paypal.me/mengxiong10)
+
+![donate](https://user-images.githubusercontent.com/14135808/83999111-a7947600-a994-11ea-84e9-9a215def4155.png)
+
 
 ## License
 

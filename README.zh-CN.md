@@ -36,6 +36,8 @@ $ npm install vue2-datepicker --save
 创建一个新的文件. e.g. `datepicker.scss`:
 
 ```scss
+$namespace: 'xmx'; // 更改默认前缀为'xmx'. 然后设置 <date-picker prefix-class="xmx" />
+
 $default-color: #555;
 $primary-color: #1284e7;
 
@@ -120,6 +122,7 @@ import 'vue2-datepicker/locale/zh-cn';
 | clearable           | 是否显示清除按钮                                 | `boolean`                                   | true           |
 | confirm             | 是否需要确认                                     | `boolean`                                   | false          |
 | confirm-text        | 确认按钮的文字                                   | `string`                                    | 'OK'           |
+| multiple            | 如果是 true, 可以选择多个日期                    | `boolean`                                   | false          |
 | disabled            | 禁用组件                                         | `boolean`                                   | false          |
 | disabled-date       | 禁止选择的日期                                   | `(date) => boolean`                         | -              |
 | disabled-time       | 禁止选择的时间                                   | `(date) => boolean`                         | -              |
@@ -128,6 +131,7 @@ import 'vue2-datepicker/locale/zh-cn';
 | input-class         | 输入框的类                                       | `string`                                    | 'mx-input'     |
 | input-attr          | 输入框的其他属性(eg: { name: 'date', id: 'foo'}) | `object`                                    | —              |
 | open                | 控制弹出层的显示                                 | `boolean`                                   | -              |
+| default-panel       | 控制打开的面板                                   | year\|month                                 | -              |
 | popup-style         | 弹出层的样式                                     | `object`                                    | —              |
 | popup-class         | 弹出层的类                                       |                                             | —              |
 | shortcuts           | 设置快捷选择                                     | `Array<{text, onClick}>`                    | -              |
@@ -148,6 +152,8 @@ import 'vue2-datepicker/locale/zh-cn';
 | show-time-header    | 是否显示时间选择面板的头部                       | `boolean`                                   | false          |
 | time-title-format   | 时间面板头部的格式化                             | [token](#token)                             | 'YYYY-MM-DD'   |
 | time-picker-options | 设置固定时间去选择                               | [time-picker-options](#time-picker-options) | null           |
+| prefix-class        | 设置 class 的前缀                                | `string`                                    | 'mx'           |
+| scroll-duration     | 设置滚动时候当选中小时的时候                     | `number`                                    | 100            |
 
 #### Token
 
@@ -291,6 +297,14 @@ data() {
 ## ChangeLog
 
 [CHANGELOG](CHANGELOG.md)
+
+## 一次性捐赠
+
+如果这个项目对你很有用，你可以请我喝杯咖啡
+
+[Paypal Me](https://www.paypal.me/mengxiong10)
+
+![donate](https://user-images.githubusercontent.com/14135808/83999111-a7947600-a994-11ea-84e9-9a215def4155.png)
 
 ## License
 

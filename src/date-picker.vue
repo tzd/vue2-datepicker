@@ -7,25 +7,48 @@
       disabled: disabled,
     }"
   >
-    <div
-      v-if="!inline"
-      :class="`${prefixClass}-input-wrapper`"
-      @mousedown="openPopup"
-      @touchstart="openPopup"
-    >
-      <slot name="input">
+    <div v-if="!inline" :class="`${prefixClass}-input-wrapper`" @mousedown="openPopup">
+      <slot
+        name="input"
+        :props="{
+          name: 'date',
+          type: 'text',
+          autocomplete: 'off',
+          value: text,
+          class: inputClass,
+          readonly: !editable,
+          disabled,
+          placeholder,
+          ...inputAttr,
+        }"
+        :events="{
+          keydown: handleInputKeydown,
+          focus: handleInputFocus,
+          blur: handleInputBlur,
+          input: handleInputInput,
+          change: handleInputChange,
+        }"
+      >
         <input
           ref="input"
-          v-bind="{ name: 'date', type: 'text', autocomplete: 'off', value: text, ...inputAttr }"
-          :class="inputClass"
-          :disabled="disabled"
-          :readonly="!editable"
-          :placeholder="placeholder"
-          @keydown="handleInputKeydown"
-          @focus="handleInputFocus"
-          @blur="handleInputBlur"
-          @input="handleInputInput"
-          @change="handleInputChange"
+          v-bind="{
+            name: 'date',
+            type: 'text',
+            autocomplete: 'off',
+            value: text,
+            class: inputClass,
+            readonly: !editable,
+            disabled,
+            placeholder,
+            ...inputAttr,
+          }"
+          v-on="{
+            keydown: handleInputKeydown,
+            focus: handleInputFocus,
+            blur: handleInputBlur,
+            input: handleInputInput,
+            change: handleInputChange,
+          }"
         />
       </slot>
       <i v-if="showClearIcon" :class="`${prefixClass}-icon-clear`" @mousedown.stop="handleClear">
@@ -95,7 +118,7 @@
 
 <script>
 import { parse, format, getWeek } from 'date-format-parse';
-import { isValidDate, isValidRangeDate } from './util/date';
+import { isValidDate, isValidRangeDate, isValidDates } from './util/date';
 import { pick, isObject, mergeDeep } from './util/base';
 import { getLocale, getLocaleFieldValue } from './locale';
 import Popup from './popup';
@@ -162,9 +185,15 @@ export default {
       type: Boolean,
       default: false,
     },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
     rangeSeparator: {
       type: String,
-      default: ' ~ ',
+      default() {
+        return this.multiple ? ',' : ' ~ ';
+      },
     },
     lang: {
       type: [String, Object],
@@ -227,6 +256,9 @@ export default {
       type: String,
       default: 'OK',
     },
+    renderInputText: {
+      type: Function,
+    },
     shortcuts: {
       type: Array,
       validator(value) {
@@ -267,6 +299,10 @@ export default {
     },
     innerValue() {
       let { value } = this;
+      if (this.validMultipleType) {
+        value = Array.isArray(value) ? value : [];
+        return value.map(this.value2date);
+      }
       if (this.range) {
         value = Array.isArray(value) ? value.slice(0, 2) : [null, null];
         return value.map(this.value2date);
@@ -276,6 +312,9 @@ export default {
     text() {
       if (this.userInput !== null) {
         return this.userInput;
+      }
+      if (typeof this.renderInputText === 'function') {
+        return this.renderInputText(this.innerValue);
       }
       if (!this.isValidValue(this.innerValue)) {
         return '';
@@ -294,6 +333,10 @@ export default {
         return mergeDeep(getLocale(), this.lang);
       }
       return getLocale(this.lang);
+    },
+    validMultipleType() {
+      const types = ['date', 'month', 'year'];
+      return this.multiple && !this.range && types.indexOf(this.type) !== -1;
     },
   },
   watch: {
@@ -373,14 +416,43 @@ export default {
       }
     },
     isValidValue(value) {
-      const validate = this.range ? isValidRangeDate : isValidDate;
-      return validate(value);
+      if (this.validMultipleType) {
+        return isValidDates(value);
+      }
+      if (this.range) {
+        return isValidRangeDate(value);
+      }
+      return isValidDate(value);
     },
-    handleSelectDate(val, type) {
+    isValidValueAndNotDisabled(value) {
+      if (!this.isValidValue(value)) {
+        return false;
+      }
+      const disabledDate =
+        typeof this.disabledDate === 'function' ? this.disabledDate : () => false;
+      const disabledTime =
+        typeof this.disabledTime === 'function' ? this.disabledTime : () => false;
+      if (!Array.isArray(value)) {
+        value = [value];
+      }
+      return value.every(v => !disabledDate(v) && !disabledTime(v));
+    },
+    handleMultipleDates(date, dates) {
+      if (this.validMultipleType && dates) {
+        const nextDates = dates.filter(v => v.getTime() !== date.getTime());
+        if (nextDates.length === dates.length) {
+          nextDates.push(date);
+        }
+        return nextDates;
+      }
+      return date;
+    },
+    handleSelectDate(val, type, dates) {
+      val = this.handleMultipleDates(val, dates);
       if (this.confirm) {
         this.currentValue = val;
       } else {
-        this.emitValue(val, type);
+        this.emitValue(val, this.validMultipleType ? `multiple-${type}` : type);
       }
     },
     handleClear() {
@@ -412,10 +484,15 @@ export default {
       this.$emit('update:open', false);
     },
     blur() {
-      this.$refs.input.blur();
+      // when use slot input
+      if (this.$refs.input) {
+        this.$refs.input.blur();
+      }
     },
     focus() {
-      this.$refs.input.focus();
+      if (this.$refs.input) {
+        this.$refs.input.focus();
+      }
     },
     handleInputChange() {
       if (!this.editable || this.userInput === null) return;
@@ -426,16 +503,20 @@ export default {
         return;
       }
       let date;
-      if (this.range) {
+      if (this.validMultipleType) {
+        date = text.split(this.rangeSeparator).map(v => this.parseDate(v.trim(), this.format));
+      } else if (this.range) {
         let arr = text.split(this.rangeSeparator);
         if (arr.length !== 2) {
+          // Maybe the separator during the day is the same as the separator for the date
+          // eg: 2019-10-09-2020-01-02
           arr = text.split(this.rangeSeparator.trim());
         }
         date = arr.map(v => this.parseDate(v.trim(), this.format));
       } else {
         date = this.parseDate(text, this.format);
       }
-      if (this.isValidValue(date)) {
+      if (this.isValidValueAndNotDisabled(date)) {
         this.emitValue(date);
         this.blur();
       } else {
